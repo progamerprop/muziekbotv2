@@ -15,11 +15,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/YoussefElshemi/Music-Bot.git"
+  
+
   },
-  "bugs": {
-    "url": "https://github.com/YoussefElshemi/Music-Bot/issues"
-  },
-  "homepage": "https://github.com/YoussefElshemi/Music-Bot#readme",
   "devDependencies": {
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.12.0",
