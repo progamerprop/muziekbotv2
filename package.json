@@ -33,6 +33,7 @@
     "moment": "^2.18.1",
     "node-json-db": "^0.7.3",
     "node-opus": "^0.2.6",
+    "run": "^1.4.0",
     "snekfetch": "^3.2.4",
     "soundcloud": "^3.1.2",
     "winston": "^2.3.1",
