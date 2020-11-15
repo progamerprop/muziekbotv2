@@ -1,9 +1,22 @@
-const emotes = require ("../config/emojis.json");
-const Discord = require("discord.js")
+const Command = require('../util/Command.js');
 
-exports.run = async (client, message, args) => {
+class Ping extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'ping',
+      description: 'This command will get the ping of the client',
+      usage: 'ping',
+      aliases: ['pong'],
+      cooldown: 5,
+      category: 'System'
 
-    //Message
-    message.channel.send(`Ping: ${client.ws.ping} ms ${emotes.success}`)
+    });
+  }
 
+  async run(message) { 
+    const m = await message.channel.send('Pinging...');
+    m.edit(`Ping: ${m.createdTimestamp - message.createdTimestamp}ms`);
+  }
 }
+
+module.exports = Ping;

@@ -1,18 +1,28 @@
-const emotes = require ("../config/emojis.json");
-const Discord = require("discord.js")
+/* eslint linebreak-style: 0 */
+const Command = require('../util/Command.js');
 
-exports.run = async (client, message, args) => {
+class Resume extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'resume',
+      description: 'This command will resume the currently paused song.',
+      usage: 'resume',
+      cooldown: 5,
+      category: 'Music'
+    });
+  }
 
-    //If the member is not in a voice channel
-    if(!message.member.voice.channel) return message.channel.send(`You're not in a voice channel ${emotes.error}`);
-
-    //Get song
-    const song = await client.player.resume(message.guild.id);
-
-    //If there's no music
-    if(!song) return message.channel.send(`No songs currently playing ${emotes.error}`);
-
-    //Message
-    message.channel.send(`Song ${song.name} resumed ${emotes.success}`);
-
+  async run(message) {
+    if (message.settings.djonly && !message.member.roles.some(c => c.name.toLowerCase() === message.settings.djrole.toLowerCase())) return message.client.embed('notDJ', message);
+    const voiceChannel = message.member.voiceChannel;
+    if (!voiceChannel) return this.client.embed('noVoiceChannel', message);
+    if (!this.client.playlists.has(message.guild.id)) return this.client.embed('emptyQueue', message);
+    const thisPlaylist = this.client.playlists.get(message.guild.id);
+    if (thisPlaylist.playing) return this.client.embed('alreadyResumed', message);
+    thisPlaylist.playing = true;
+    thisPlaylist.connection.dispatcher.resume();
+    return this.client.embed('resumed', message);
+  }
 }
+
+module.exports = Resume;

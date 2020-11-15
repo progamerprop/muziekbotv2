@@ -1,142 +1,55 @@
-const fetch = require('snekfetch');
-const ytdl = require('ytdl-core');
-const fs = require('fs');
-const config = require('../config/config.json');
-const fetchVideoInfo = require('youtube-info');
-const Discord = require('discord.js');
-const moment = require('moment');
-const db = require('node-json-db');
+const Command = require('../util/Command');
+const { MessageEmbed } = require('discord.js');
+const { ytapikey } = require('../config.json');
+const ytapi = require('simple-youtube-api'); 
+const handleVideo = require('../util/MusicHandling');
+const youtube = new ytapi(ytapikey); 
 
-const queue = new db('./queue/songs.json', true, true);
-const titleForFinal = [];
-const chalk = require('chalk');
+class Play extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'play',
+      usage: '-play <url|name|id>',
+      description: 'This command plays a song using the bot',
+      cooldown: 1,
+      extended: 'This command plays a song from youtube using the bot, but you must be in the voice call to use this',
+      category: 'Music'
+    });
+  }
 
-const skipper = [];
-const skipReq = 0;
-
-exports.run = async (client, message) => {
-  // Guilds = {};
-	message.delete();
-	// =========================Play Command==============================
-	const toPlay = message.content.split(' ').slice(1).join(' ');
-	if (!toPlay) {
-		return message.reply('Please add a link of the song to the command');
-	}
-
-	if (!message.member.voiceChannel) {
-		return message.channel.send('Please get into a voice channel');
-	}
-	if (!toPlay.includes('&list') && !toPlay.includes('index')) {
-		fetch.get(`https://www.googleapis.com/youtube/v3/search?part=id&type=video&q=` + encodeURIComponent(toPlay) + '&key=' + config.ytKey)
-     .then(async r => {
-	if (r.body.items[0]) {
-		fetchVideoInfo(`${r.body.items[0].id.videoId}`).then(l => {
-			titleForFinal.push(l.title);
-			const embed = new Discord.RichEmbed()
-           .setAuthor(`Requested by ${message.author.username} and added to the queue`, l.thumbnailUrl)
-           .addField(`Song Info`, `**Owner:** ${l.owner}\n\
-    **Date Published:** ${l.datePublished}\n\
-    **Duration:** ${(l.duration / 60).toFixed(2)} Minutes\n\
-    **Views:** ${l.views}\n\
-    **Song Name:** ${l.title}`)
-           .setThumbnail(l.thumbnailUrl);
-			message.channel.send({embed});
-		});
-	}
-
-	try {
-		queue.getData(`/parent/${message.guild.id}`);
-	} catch (e) {
-		queue.push(`/parent/${message.guild.id}/TheSongs/mySongs`, {queue: []}, false);
-	}
-
-	try {
-		queue.push(`/parent/${message.guild.id}/TheSongs/mySongs`, {queue: [r.body.items[0].id.videoId]}, false);
-	} catch (e) {
-		logger.error(e);
-	}
-
-	if (!message.guild.voiceConnection) {
-		message.member.voiceChannel.join().then(async connection => {
-			logger.info(`Started to stream ${chalk.magenta(r.body.items[0].title)} for ${message.author.username}`);
-			play(connection, message);
-		});
-	}
-})
-      .catch(e => {
-	message.reply('We could\' find the requested song :pensive:');
-	logger.error(e);
-});
-	} else {
-	// =========================Plays Playlists==============================
-		await playLists(message, toPlay);
-		logger.info(`Streaming a playlist for ${message.author.username}`);
-	}
-};
-
-// =========================Play Function==============================
-
-function play(connection, message) {
-	const songsQueue = [];
-	const json = queue.getData(`/parent/${message.guild.id}/TheSongs/mySongs/queue`);
-	dispatcher = connection.playStream(ytdl(json[0], {filter: 'audioonly'}));
-
-	const list = queue.getData(`/parent/${message.guild.id}/TheSongs/mySongs/queue[0]`);
-	if (!message.guild.voiceConnection) {
-		message.member.voiceChannel.join().then(async connection => {
-			logger.info(`Started to stream ${chalk.magenta(titleForFinal)} for ${message.author.username}`);
-			play(connection, message);
-		});
-	}
-	fetchVideoInfo(`${list}`).then(l => {
-		message.channel.send(`Started to stream **\`${l.title}\`** Requested by ${message.author.username}`);
-		logger.info(`Downloading the song ==> ${l.title} for ${message.author.username}`);
-		logger.info(`Downloaded ${l.title} successfully Enjoy!`);
-	});
-	setTimeout(() => {
-		queue.delete((`/parent/${message.guild.id}/TheSongs/mySongs/queue[0]`));
-	}, 3000);
-
-	dispatcher.on('end', () => {
-		if (list) {
-			play(connection, message);
-		} else {
-			connection.disconnect();
-			queue.delete(`/parent/`);
-		}
-	});
+  async run(message, args) {
+    if (message.settings.djonly && !message.member.roles.some(c => c.name.toLowerCase() === message.settings.djrole.toLowerCase())) return message.client.embed('notDJ', message);
+    if (!args.length) return this.client.embed('noArgs', message);
+    const voiceChannel = message.member.voiceChannel;
+    if (!voiceChannel) return this.client.embed('noVoiceChannel', message);
+    const url = args[0] ? args[0].replace(/<(.+)>/g, '$1') : '';
+    const permissions = voiceChannel.permissionsFor(this.client.user).toArray();
+    if (!permissions.includes('CONNECT')) return this.client.embed('noPerms-CONNECT', message);
+    if (!permissions.includes('SPEAK')) return this.client.embed('noPerms-SPEAK', message);
+    if (url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
+      const playlist = await youtube.getPlaylist(url);
+      const videos = await playlist.getVideos();
+      for (const video of Object.values(videos)) {
+        const video2 = await youtube.getVideoByID(video.id); // eslint-disable-line no-await-in-loop
+        await handleVideo(video2, message, voiceChannel, true); // eslint-disable-line no-await-in-loop
+      }
+      const embed = new MessageEmbed()
+        .setAuthor('Playlist')
+        .setDescription(`✅ Playlist: **${playlist.title}** has been added to the queue!`)
+        .setColor(message.guild.me.roles.highest.color || 0x00AE86);
+      message.channel.send(embed);
+    } else {
+      let video;
+      try {
+        video = await youtube.getVideo(url);
+      } catch (error) {
+        const videos = await youtube.searchVideos(args.join(' '), 1);
+        if (!videos.length) return this.client.embed('noSongsFound', message, args);
+        video = await youtube.getVideoByID(videos[0].id);   
+      }
+      return handleVideo(video, message, voiceChannel);
+    }
+  }
 }
 
-// =========================Get Playlist Function==============================
-
-function playLists(message, id) {
-	fetch.get('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=' + id.split('&list=')[1] + '&key=' + config.ytKey)
-    .then(res => {
-	const playembed = new Discord.RichEmbed()
-			.setAuthor(`New playlist added contains ${res.body.items.length} songs in it`, message.author.displayAvatarURL);
-	message.channel.send({embed: playembed});
-	try {
-		queue.getData(`/parent/${message.guild.id}`);
-	} catch (e) {
-		queue.push(`/parent/${message.guild.id}/TheSongs/mySongs`, {queue: []}, false);
-	}
-	res.body.items.forEach(i => {
-		if (i.id) {
-			queue.push(`/parent/${message.guild.id}/TheSongs/mySongs`, {queue: [i.snippet.resourceId.videoId]}, false);
-		}
-	});
-	if (!message.guild.voiceConnection) {
-		message.member.voiceChannel.join().then(async connection => {
-			play(connection, message);
-		});
-	}
-})
-    .catch(e => {
-	logger.error(e);
-	logger.error(id.split('&list=')[1]);
-});
-}
-
-module.exports.help = {
-	name: 'play'
-};
+module.exports = Play;

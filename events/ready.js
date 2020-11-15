@@ -1,11 +1,26 @@
-const config = require(`../config/bot.json`)
+const Event = require('../util/Event.js');
+const fs = require('fs');
 
-module.exports = async (client) => {
+class Ready extends Event {
 
-    //If the bot is ready it sends a message in the console
-    console.log(`Ready on ${client.guilds.cache.size} servers, for a total of ${client.users.cache.size} users`);
+  constructor(...args) {
+    super(...args);
+  }
 
-    //Game
-    client.user.setActivity(config.game)
+  async run() {
+    this.client.log(`${this.client.user.tag} is ready in ${this.client.guilds.size} guild and serving ${this.client.guilds.reduce((c, p) => c + p.memberCount, 0)} users!`);
+    this.client.guilds.forEach(g => {
+      if (!this.client.settings.has(g.id)) this.client.setDefaultGuildSettings(g.id);
+    });
 
+    if (fs.existsSync('./data/reboot.json')) {
+      const data = JSON.parse(fs.readFileSync('./data/reboot.json', 'utf8'));
+      const channel = this.client.channels.get(data.channelID);
+      const message = await channel.messages.fetch(data.messageID);
+      message.edit('Successfully rebooted the bot!');
+      fs.unlinkSync('./data/reboot.json');
+    }
+  }
 }
+
+module.exports = Ready;

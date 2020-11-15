@@ -1,25 +1,30 @@
-### ArsMusic-Bot
-Hello guys, Introducing: ArsMusic-Bot.
-`"But Artz what's this??"`, The answer is actually simple, A free to use javascript music bot
-Yes yes.. you heard that right, Completely free! so lets move to the set up
+# Music Bot - By Youssef
 
-### Setting up
-This is the "harder part" but let's check if we got all the requirements for that bot<br />
-**Node.js 8+** ==> [Node](https://nodejs.org/en/)<br />
-**Python 3+** ==> [Python](https://www.python.org/downloads/)<br />
-So we checked our requirements and everything is set up.
-Lets start by opening the folder called `config` and inside open `config.json.example`<br />
-Take of the example out of the name so it will be `config.json` then go ahead and fill the config file<br />
-with ==> **Your bot's Discord token** , **Your own youtube api key** can easily get ==> [Here](https://console.developers.google.com/)<br />
-So what we did now is setting up all the Tokens and you can change to prefix if you want but it is optional<br />
-**DEFAULT_PREFIX** ==> **`.`** Now we want to open a command prompt inside the musicBot folder and type<br />
-`npm install` that will basically install all the dependencies for that project.<br />
-After that's done type in the console `node app.js` **Please no nodemon**.<br />
-and booooooom we are done! simply type `.play <song name / link>` or insted of `.` with your prefix to start download songs<br />
-The bot comes up with a custom logger that I wrote can be find inside `classes/logger.js`
+This a music bot crafted in discord.js master, a discord api wrapper. So far, this plays music from youtube, and youtube only. 
 
-__ENOJY THE BOT IS THE KEY! :D__
-# ChangeLog
-__**7/25/2017**__ - manage to get the songs playing and placed inside the queue **Per Server**.
-___
-__**7/26/2017**__ - Full playlist support with working skip command.
+# How to host:
+
+1. Clone this repository.
+2. Install all of the npm modules by running: `npm i`.
+3. Install node-opus or opusscript, and ffmpeg, by also running `npm i ffmpeg-binaries node-opus`.
+4. Create a file called config.json, make sure it looks like this:
+
+```json
+{
+  "token": "BOT TOKEN HERE",
+  "ytapikey": "YOUTUBE API KEY",
+  "ownerid": "YOUR ID",
+  "defaultSettings": {
+    "prefix": "-",
+    "ratelimit": false,
+    "djonly": false,
+    "djrole": "dj",
+    "maxqueuelength": 20
+  }
+}
+```
+5. Save it and run it using `node index.js` or `nodemon index.js` or `pm2 start index.js`
+
+This will be updated over time, so ensure to update your own version alongside mine to ensure that all of the files are up to date. If you want to make a pull request, go for it and ensure you include all of the information necessary and describe it as much as you could. "# Music-Bot" 
+
+I've got to give some credit to York from An Idiot's Guide. This command handler was inspired by his from Misaki, an anime based bot which could be found [here](https://github.com/NotAWeebDev/Misaki).

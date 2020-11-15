@@ -1,19 +1,27 @@
-const emotes = require ("../config/emojis.json");
-const Discord = require("discord.js")
+/* eslint linebreak-style: 0 */
+const Command = require('../util/Command.js');
 
-exports.run = async (client, message, args) => {
+class Stop extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'stop',
+      description: 'This command will stop the current playing songs and clear the queue.',
+      usage: 'stop',
+      cooldown: 5,
+      category: 'Music'
+    });
+  }
 
-    //If the member is not in a voice channel
-    if(!message.member.voice.channel) return message.channel.send(`You're not in a voice channel ${emotes.error}`);
-
-    //If there's no music
-    if(!client.player.isPlaying(message.guild.id)) return message.channel.send(`No music playing on this server ${emotes.error}`);
-
-    //Stop player
-    client.player.setRepeatMode(message.guild.id, false);
-    client.player.stop(message.guild.id);
-
-    //Message
-    message.channel.send(`Music stopped ${emotes.success}`);
-
+  async run(message) { 
+    if (message.settings.djonly && !message.member.roles.some(c => c.name.toLowerCase() === message.settings.djrole.toLowerCase())) return message.client.embed('notDJ', message);
+    const voiceChannel = message.member.voiceChannel;
+    if (!voiceChannel) return this.client.embed('noVoiceChannel', message);
+    if (!this.client.playlists.has(message.guild.id)) return this.client.embed('emptyQueue', message);
+    const thisPlaylist = this.client.playlists.get(message.guild.id);
+    thisPlaylist.songs = [];
+    thisPlaylist.connection.dispatcher.end();
+    return this.client.embed('stopped', message);
+  }
 }
+
+module.exports = Stop;

@@ -1,33 +1,32 @@
-const emotes = require ("../config/emojis.json");
-const Discord = require("discord.js")
+/* eslint linebreak-style: 0 */
+const Command = require('../util/Command.js');
 
-exports.run = async (client, message, args) => {
+class Loop extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'loop',
+      description: 'This command will loop or unloop the current playing song.',
+      usage: 'loop',
+      aliases: ['unloop'],
+      cooldown: 5,
+      category: 'Music'
+    });
+  }
 
-    //If the member is not in a voice channel
-    if(!message.member.voice.channel) return message.channel.send(`You're not in a voice channel ${emotes.error}`);
-
-    //If there's no music
-    if(!client.player.isPlaying(message.guild.id)) return message.channel.send(`No music playing on this server ${emotes.error}`);
-
-    //Repeat mode
-    const repeatMode = client.player.getQueue(message.guild.id).repeatMode;
-
-    //If the mode is enabled
-    if(repeatMode) {
-
-        client.player.setRepeatMode(message.guild.id, false);
-
-        //Message
-        return message.channel.send(`Repeat mode disabled ${emotes.success}`);
-
-    //If the mode is disabled
+  async run(message) {
+    if (message.settings.djonly && !message.member.roles.some(c => c.name.toLowerCase() === message.settings.djrole.toLowerCase())) return message.client.embed('notDJ', message);
+    const voiceChannel = message.member.voiceChannel;
+    const thisPlaylist = this.client.playlists.get(message.guild.id);
+    if (!voiceChannel) return this.client.embed('noVoiceChannel', message);
+    if (!this.client.playlists.has(message.guild.id)) return this.client.embed('emptyQueue', message);
+    if (thisPlaylist.loop) {
+      thisPlaylist.loop = false;
+      return this.client.embed('unloopedEmbed', message);
     } else {
-
-        client.player.setRepeatMode(message.guild.id, true);
-
-        //Message
-        return message.channel.send(`Repeat mode enabled ${emotes.success}`);
-
+      thisPlaylist.loop = true;
+      return this.client.embed('loopedEmbed', message);
     }
-    
+  }
 }
+
+module.exports = Loop;
