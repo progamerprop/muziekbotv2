@@ -1,17 +1,33 @@
-const emotes = require ("../config/emojis.json");
-const Discord = require("discord.js")
+exports.run = async (client, message) => {
+	let skipper = [];
+	let skipReq = 0;
 
-exports.run = async (client, message, args) => {
-
-    //If the member is not in a voice channel
-    if(!message.member.voice.channel) return message.channel.send(`You're not in a voice channel ${emotes.error}`);
-
-    //If there's no music
-    if(!client.player.isPlaying(message.guild.id)) return message.channel.send(`No music playing on this server ${emotes.error}`);
-
-    const track = await client.player.skip(message.guild.id);
-
-    //Message
-    message.channel.send(`Song ${track.name} skipped ${emotes.success}`);
-
+	if (skipper.indexOf(message.author.id) === -1) {
+		skipper.push(message.author.id);
+		skipReq++;
+		if (!message.member.voiceChannel) {
+			return message.reply('You can\' skip since you aren\'t In a voice channel!');
+		}
+		if (skipReq >= Math.ceil((message.member.voiceChannel.members.size - 1) / 2)) {
+			try {
+				await skip_song();
+				skipReq = 0;
+				skipper = [];
+				message.reply('Skipped on the song successfully!');
+				logger.info(`${message.author.username} Skipped successfully on the song`);
+			} catch (e) {
+				message.channel.send('**No songs are currently playing!**');
+			}
+  			} else {
+  				message.reply(`Hey ${message.author.username}, Your skip as been added to the list\n\
+  you need` + Math.ceil(((message.member.voiceChannel.members.size - 1) / 2) - skipReq) + 'Guy(s) to skip the song');
+  			}
+  	}
+};
+function skip_song() {
+	dispatcher.end();
 }
+
+module.exports.help = {
+	name: 'skip'
+};

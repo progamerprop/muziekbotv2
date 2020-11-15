@@ -1,3 +1,10 @@
-# Node
+#node_modules
 node_modules/
 
+#config
+config/config.json
+
+songs/
+
+#queue
+commands/songs.json

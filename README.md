@@ -1,87 +1,25 @@
-# Music-bot
-A complete code to download for a music bot. Using a module (discord-player) 🎧
+### ArsMusic-Bot
+Hello guys, Introducing: ArsMusic-Bot.
+`"But Artz what's this??"`, The answer is actually simple, A free to use javascript music bot
+Yes yes.. you heard that right, Completely free! so lets move to the set up
 
-The module (discord-player) may currently encounter various problems as a result. 
-Please don't open exits or don't contact me. I am aware of these multiple problems.
-I have already reported them to the creator of the module, who is already working on them ⚠️
+### Setting up
+This is the "harder part" but let's check if we got all the requirements for that bot<br />
+**Node.js 8+** ==> [Node](https://nodejs.org/en/)<br />
+**Python 3+** ==> [Python](https://www.python.org/downloads/)<br />
+So we checked our requirements and everything is set up.
+Lets start by opening the folder called `config` and inside open `config.json.example`<br />
+Take of the example out of the name so it will be `config.json` then go ahead and fill the config file<br />
+with ==> **Your bot's Discord token** , **Your own youtube api key** can easily get ==> [Here](https://console.developers.google.com/)<br />
+So what we did now is setting up all the Tokens and you can change to prefix if you want but it is optional<br />
+**DEFAULT_PREFIX** ==> **`.`** Now we want to open a command prompt inside the musicBot folder and type<br />
+`npm install` that will basically install all the dependencies for that project.<br />
+After that's done type in the console `node app.js` **Please no nodemon**.<br />
+and booooooom we are done! simply type `.play <song name / link>` or insted of `.` with your prefix to start download songs<br />
+The bot comes up with a custom logger that I wrote can be find inside `classes/logger.js`
 
-Looking for a code for a music bot ? This fully open source code is made for your !
-Warning, this code uses the v12 of the Discord.js module. Previous versions such as (11.5.1, 11.5.0 or other) will not be supported.
-
-Well, let's start by downloading the code.
-Go to the folder `config` then the file `config.json`.
-For the bot to be able to start, please complete the file with your credentials as follows :
-
-```js
-{
-    "prefix": "PREFIX",
-    "game": "GAME",
-    "token_bot": "TOKEN"
-}
-```
-
-Reminder :
-
-- `prefix`, the prefix that will be set to use the bot.
-- `game`, the status of the bot.
-- `token_bot`, the token of the bot available on the [Discord Developers](https://discordapp.com/developers/applications) section.
-
-To customize the emojis go to the file `emojis.json`.
-Emojis are already defined by default but you can modify them if you wish.
-
-```js
-{
-    "music": ":musical_note:",
-    "queue": ":bar_chart:",
-    "error": ":x:",
-    "success": ":white_check_mark:"
-}
-```
-
-Go to the console and type this :
-
-```
-npm i
-```
-
-To start the bot :
-
-```
-#With Node
-node index.js
-
-#With pm2
-pm2 start index.js --name "MusicBot"
-```
-
-All you have to do is turn on your bot !
-
-### 🎵 Music commands
-
-```
-play <name>, play music in a vocal salon.
-pause, pause the current music.
-resume, puts the current music back on. 
-queue, see the next musics.
-np, see music in progress.
-volume <1 - 100>, change the volume.
-loop, to enable or disable the repeat function.
-skip, skip to next music.
-stop, stop all music.
-filter <filter>, add / remove filters.
-w-filters, see filters.
-clear-queue, delete the next music.
-```
-
-### 💡 General commands
-
-```
-help, see the list of available orders.
-ping, see the bot latency.
-```
-
-Utilities (to change the code) :
-
-Find all the functions available on the official code [right here](https://github.com/Androz2091/discord-player).
-
-This is used with [discord.js](https://www.npmjs.com/package/discord.js) and [discord-player](https://www.npmjs.com/package/discord-player).
+__ENOJY THE BOT IS THE KEY! :D__
+# ChangeLog
+__**7/25/2017**__ - manage to get the songs playing and placed inside the queue **Per Server**.
+___
+__**7/26/2017**__ - Full playlist support with working skip command.

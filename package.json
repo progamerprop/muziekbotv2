@@ -1,26 +1,45 @@
 {
-  "name": "muziekbotv2",
-  "version": "1.0.0",
-  "description": "Henkie",
-  "main": "index.js",
-  "dependencies": {
-    "discord.js": "^12.4.1"
-  },
-  "devDependencies": {},
+  "name": "musicbot",
+  "version": "0.0.1",
+  "description": "A free to use MusicBot",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/progamerprop/muziekbotv2.git"
+    "url": "git+https://github.com/TheOnlyArtz/MusicBot.git"
   },
   "keywords": [
-    "Muziek"
+    "music",
+    "bot",
+    "discord",
+    "musicbot",
+    "javascript",
+    "js"
   ],
-  "author": "AronGaming",
-  "license": "ISC",
+  "author": "TheOnlyArtz / AmitKatz",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/progamerprop/muziekbotv2/issues"
+    "url": "https://github.com/TheOnlyArtz/MusicBot/issues"
   },
-  "homepage": "https://github.com/progamerprop/muziekbotv2#readme"
+  "homepage": "https://github.com/TheOnlyArtz/MusicBot#readme",
+  "dependencies": {
+    "chalk": "^2.0.1",
+    "cli-table2": "^0.2.0",
+    "discord.js": "^11.1.0",
+    "ffmpeg-binaries": "^3.2.2-3",
+    "get-youtube-id": "^1.0.0",
+    "moment": "^2.18.1",
+    "node-json-db": "^0.7.3",
+    "node-opus": "^0.2.6",
+    "snekfetch": "^3.2.4",
+    "soundcloud": "^3.1.2",
+    "winston": "^2.3.1",
+    "xo": "^0.18.2",
+    "youtube-info": "^1.1.1",
+    "youtube-playlist-info": "^0.1.0",
+    "youtube-video-info": "0.0.1",
+    "ytdl-core": "^0.14.4"
+  }
 }
